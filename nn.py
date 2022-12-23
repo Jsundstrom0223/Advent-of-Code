@@ -1,7 +1,7 @@
 import re
 import itertools
 from collections import defaultdict
-from anytree import Node, RenderTree, findall
+from anytree import Node, RenderTree, findall, PreOrderIter, find_by_attr
 challenge_input = "d7.txt"
 callenge_input = "sample.txt"
 
@@ -94,21 +94,29 @@ print("LS", lscommands)
 print()
     
 def make_tree(dir_list):
+   
     for e in dir_list:
-        print("E", e)
+        # print("E", e)
         if e == "/":
             outer = Node("/", parent=None)
         else:
-            splite = e.split(" ")[1]
             # print(splite, "!!!!!!!!!!")
             splite = Node(e, parent=outer)
+            # print(splite.path, "{PPPPP")
             # print(node.name)
     # print(RenderTree(outer))
+
+    # print(bb, "!!!")
+    return outer
+
     # print(outer.children, "KIDS")
+    # style=AsciiStyle()
 
 
-make_tree(dir_list)
-
+outer = make_tree(dir_list)
+print(RenderTree(outer))
+print(outer.children)
+# print(a.parent)
 def make_it_chunky(x, y):
     
     start = lscommands[x] - 1
@@ -125,75 +133,47 @@ idirs = make_it_chunky(0, 1)
 # print("IDIRS", idirs)
   
 
-def parser(idirs):
+def parser(idirs, outer):
+    adder = []
+    command = idirs[0].split(" ")
+    if idirs[1] == "$ ls":
+        print("JAAJJAJAJA")
+    idirs.pop(1)
+    idirs.pop(0)
+    target = command[2]
+    if target == "/":
+        target = outer
+    # print(target, "@")
+    # for pre, node in RenderTree(outer):
+    #     print(pre, node, "?????????????")
+    bb = [node.name for node in PreOrderIter(outer)]
+    # print(outer.children, bb, "BBBBBBB")
+
+        # print(spliti, "SPLITI!!!")
+   
+
     for i in idirs:
-        print(i)
+    ####need to account for switching dirs if cd, otherwise successfully making new kids for items not in tree
+    #         print(i)
+    #         print("$$$$$$")
+    #         idirs.remove(i)
+    #         print(idirs)
 
-        spliti = i.split(" ")
-        if spliti[1] == "cd":
-            target = spliti[2]
-            # print("TAR", target)
+        here = i.split(" ")[0] 
 
-        if spliti[1] == "ls":
-            print("done")
-            break
+        hh = [node.name for node in outer.children if node.name == i]
+        if i not in hh:
+            print("FFF", i)
+            here = i.split(" ")[0]
+            i = Node(here, parent=target)
+        else:
+            print("YYYY", i)
+            
+    print(RenderTree(outer))
 
-        print("TAR", target)
     print("DONE")
-    # findnode = findall(Node.root, filter_ =lambda Node: i in DirNodes.Node.children)
-    # print(findnode)
 
-
-
-parser(idirs)
-
-
-def command_handler(idirs):
-        ll = []
-
-        changed_to = idirs[0]
-        which_dir = changed_to.split(" ")[2]
-       
-        command = idirs[1]
-
-        # print(f" CHANGED TO {changed_to}, NAME OF CD {which_dir}, COMMAND {command}, !")
-        idirs.remove(command)
-       
-        if command == "$ ls":
-            idirs.remove(changed_to)      
-            for item in idirs:
-                if item == "$ cd ..":
-                    break
-
-                split_dir_file_name = item.split(" ")
-                if item in dir_list:
-                    to_add = split_dir_file_name[1]
-                    # print(to_add, "!!!!!!!!!!")
-               
-                else:
-                    print(f"NOT IN LIST {item}, {which_dir} , 96")
-                    # to_add = int(split_dir_file_name[0])
-                    to_add = int(split_dir_file_name[0])
-                    # print(type(to_add))
-                ll.append(to_add)
-           
-            elf_dic[which_dir] = ll
-            # print(which_dir)
-        return elf_dic
-    
-def handle_inner_dirs():
-    for k,v in elf_dic.items():
-        for item in v:
-            if item in dir_list:
-                print(item, "HANDLE", "\n")
-
-                here = v.index(item)
-                v.pop(here)
-                v.insert(here, {item: elf_dic[item]})
-
-kt = 0
-newd = defaultdict(list)
-lll = []
+parser(idirs, outer)
 
 def totaler(o, kt):
 
@@ -204,8 +184,7 @@ def totaler(o, kt):
                     print(i, type(i), "!!!!!!!!!!!", o)
                 
                     kt = kt + i
-                    # except:
-                    #     
+                  
                 else:
                     kt = totaler(i, kt)
                     print(i, "_________________")
@@ -240,10 +219,3 @@ def executer():
         x += 1
         y += 1
   
-    handle_inner_dirs()
-    hhh = 0
-
-#     for k, v in elf_dic.items():
-#         print("K!:", k, "\n")    hhh += totaler(k, 0) 
-# #         hhh = totaler(k, 0) 
-
